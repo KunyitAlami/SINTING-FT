@@ -1,0 +1,39 @@
+{
+  "_format": "hh3-sol-build-info-1",
+  "id": "solc-0_8_24-a215ae430bf4cbb75270f778bef346615af4d305",
+  "solcVersion": "0.8.24",
+  "solcLongVersion": "0.8.24+commit.e11b9ed9",
+  "userSourceNameMap": {
+    "contracts/TingTingVoting.sol": "project/contracts/TingTingVoting.sol"
+  },
+  "input": {
+    "language": "Solidity",
+    "settings": {
+      "evmVersion": "shanghai",
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "outputSelection": {
+        "*": {
+          "": [
+            "ast"
+          ],
+          "*": [
+            "abi",
+            "evm.bytecode",
+            "evm.deployedBytecode",
+            "evm.methodIdentifiers",
+            "metadata"
+          ]
+        }
+      },
+      "remappings": []
+    },
+    "sources": {
+      "project/contracts/TingTingVoting.sol": {
+        "content": "// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.7;\r\n\r\ncontract TingTingVoting {\r\n    event VoteIn(address dompetPemilih, uint256 idKandidat);\r\n    event VoterRegistered(address dompetPemilih); \r\n\r\n    mapping(address => bool) public alreadyVote;\r\n    mapping(address => bool) public isEligible; \r\n    \r\n    address public comittee;\r\n\r\n    struct Candidate {\r\n        uint256 id;\r\n        string name;\r\n        uint256 totalVote;\r\n    }\r\n\r\n    Candidate[] public candidateList;\r\n    \r\n    // hanya sender yang boleh akses\r\n    modifier onlyComittee() {\r\n        require(msg.sender == comittee, \"Akses Ditolak: Anda bukan panitia!\");\r\n        _;\r\n    }\r\n\r\n    // syarat voting\r\n    modifier noVoteYet() {\r\n        require(isEligible[msg.sender] == true, \"Maaf, Anda tidak terdaftar dalam DPT (Whitelist)!\");\r\n        require(alreadyVote[msg.sender] == false, \"Maaf, Anda Sudah Pernah Melakukan Voting!\");\r\n        _;\r\n    }\r\n\r\n    constructor() {\r\n        comittee = msg.sender; // Orang yang deploy otomatis jadi Ketua Panitia\r\n        candidateList.push(Candidate(0, \"Kandidat 1: Budi & Siti\", 0));\r\n        candidateList.push(Candidate(1, \"Kandidat 2: Andi & Joko\", 0));\r\n    }\r\n\r\n    // daftar voter\r\n    function registerVoter(address _voter) public onlyComittee {\r\n        require(isEligible[_voter] == false, \"Pemilih ini sudah terdaftar sebelumnya!\");\r\n        isEligible[_voter] = true; // Tandai dia berhak memilih\r\n        \r\n        emit VoterRegistered(_voter);\r\n    }\r\n\r\n    // fungsi voting\r\n    function vote(uint256 _idKandidat) public noVoteYet {\r\n        require(_idKandidat < candidateList.length, \"ID Kandidat tidak valid!\");\r\n\r\n        candidateList[_idKandidat].totalVote++;\r\n        alreadyVote[msg.sender] = true;\r\n\r\n        emit VoteIn(msg.sender, _idKandidat);\r\n    }\r\n\r\n    // fungsi melihat daftar kandidat\r\n    function getAllCandidates() public view returns (Candidate[] memory) {\r\n        return candidateList;\r\n    }\r\n}"
+      }
+    }
+  }
+}
