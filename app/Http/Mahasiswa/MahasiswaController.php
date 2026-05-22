@@ -4,7 +4,7 @@ namespace App\Http\Mahasiswa;
 
 use App\Http\Controllers\Controller;
 
-class MahasiswaContorller extends Controller
+class MahasiswaController extends Controller
 {
     public function dashboard()
     {
