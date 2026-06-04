@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.7;
+pragma solidity ^0.8.24;
 
 contract TingTingVoting {
     event VoteIn(address dompetPemilih, uint256 idKandidat);
     event VoterRegistered(address dompetPemilih);
+    event CandidateAdded(uint256 id, string name);
 
     mapping(address => bool) public alreadyVote;
     mapping(address => bool) public isEligible;
@@ -31,9 +32,14 @@ contract TingTingVoting {
 
     constructor() {
         committee = msg.sender;
+    }
 
-        candidateList.push(Candidate(0, "Kandidat 1: Budi & Siti", 0));
-        candidateList.push(Candidate(1, "Kandidat 2: Andi & Joko", 0));
+    function addCandidate(string memory _name) public onlyCommittee {
+        uint256 newCandidateId = candidateList.length;
+        
+        candidateList.push(Candidate(newCandidateId, _name, 0));
+        
+        emit CandidateAdded(newCandidateId, _name);
     }
 
     function registerVoter(address _voter) public onlyCommittee {

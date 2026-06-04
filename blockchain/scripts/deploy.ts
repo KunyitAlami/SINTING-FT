@@ -1,16 +1,13 @@
-import hre from "hardhat";
+import { network } from "hardhat";
 
-async function main() {
-  console.log("Memulai proses deployment ke Sepolia...");
+const { ethers, networkName } = await network.create();
 
-  const TingTingVoting = await hre.ethers.getContractFactory("TingTingVoting");
-  const voting = await TingTingVoting.deploy();
-  await voting.waitForDeployment();
+console.log(`Memulai proses deployment ke ${networkName}...`);
 
-  console.log(`🎉 BERHASIL! TingTingVoting mendarat di alamat: ${voting.target}`);
-}
+const voting = await ethers.deployContract("TingTingVoting");
 
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+console.log("Menunggu konfirmasi deployment...");
+await voting.waitForDeployment();
+
+const contractAddress = await voting.getAddress();
+console.log(`🎉 TingTingVoting berhasil di-deploy ke alamat: ${contractAddress}`);
