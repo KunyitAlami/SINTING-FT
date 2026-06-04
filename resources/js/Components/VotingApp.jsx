@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserProvider, Contract } from 'ethers';
+
+// import file abi
 import TingTingArtifact from '../contracts/TingTingVoting.json';
 
-const CONTRACT_ADDRESS = "0x4C973E008Be1D16571cb6f4bbfbe9bcaBe2b2e9A";
+const CONTRACT_ADDRESS = "0xB4F95ca65dAaCebcf95A5Fdf57ed4FF7730e7555";
 const CONTRACT_ABI = TingTingArtifact.abi;
 
 export default function VotingApp() {
@@ -50,6 +52,7 @@ export default function VotingApp() {
             const provider = new BrowserProvider(window.ethereum);
             const contract = new Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
 
+            // KEMBALI MENGGUNAKAN getAllCandidates KARENA SUDAH ADA DI ABI
             const data = await contract.getAllCandidates();
 
             const formattedCandidates = data.map(kandidat => ({

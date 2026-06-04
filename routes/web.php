@@ -14,6 +14,3 @@ Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])
 
 Route::get('/mahasiswa/dashboard', [MahasiswaController::class, 'dashboard'])
     ->name('mahasiswa.dashboard');
-
-Route::get('/mahasiswa/dashboard', [MahasiswaController::class, 'dashboard'])
-    ->name('mahasiswa.dashboard');

@@ -32,8 +32,10 @@ class LoginController extends Controller
                 ->withInput();
         }
 
+        $request->session()->regenerate();
+
         session([
-            'user_id' => $user->id,
+            'user_id' => $user->NIM,
             'nama' => $user->nama,
             'nim' => $user->NIM,
             'role' => $user->role,

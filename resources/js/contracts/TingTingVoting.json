@@ -10,6 +10,25 @@
         "inputs": [
             {
             "indexed": false,
+            "internalType": "uint256",
+            "name": "id",
+            "type": "uint256"
+            },
+            {
+            "indexed": false,
+            "internalType": "string",
+            "name": "name",
+            "type": "string"
+            }
+        ],
+        "name": "CandidateAdded",
+        "type": "event"
+        },
+        {
+        "anonymous": false,
+        "inputs": [
+            {
+            "indexed": false,
             "internalType": "address",
             "name": "dompetPemilih",
             "type": "address"
@@ -36,6 +55,19 @@
         ],
         "name": "VoterRegistered",
         "type": "event"
+        },
+        {
+        "inputs": [
+            {
+            "internalType": "string",
+            "name": "_name",
+            "type": "string"
+            }
+        ],
+        "name": "addCandidate",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
         },
         {
         "inputs": [
@@ -87,7 +119,7 @@
         },
         {
         "inputs": [],
-        "name": "comittee",
+        "name": "committee",
         "outputs": [
             {
             "internalType": "address",
@@ -123,6 +155,19 @@
             "internalType": "struct TingTingVoting.Candidate[]",
             "name": "",
             "type": "tuple[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+        },
+        {
+        "inputs": [],
+        "name": "getTotalCandidates",
+        "outputs": [
+            {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
             }
         ],
         "stateMutability": "view",

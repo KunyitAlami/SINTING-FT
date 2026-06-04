@@ -36,9 +36,9 @@ contract TingTingVoting {
 
     function addCandidate(string memory _name) public onlyCommittee {
         uint256 newCandidateId = candidateList.length;
-        
+
         candidateList.push(Candidate(newCandidateId, _name, 0));
-        
+
         emit CandidateAdded(newCandidateId, _name);
     }
 

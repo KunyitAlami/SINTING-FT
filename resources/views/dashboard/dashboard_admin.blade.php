@@ -1,498 +1,3 @@
-{{-- <!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Admin KPU - SINTING-FT</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.2/dist/ethers.umd.min.js"></script>
-</head>
-<body class="bg-gray-100 min-h-screen">
-
-    <div class="flex min-h-screen">
-
-        <aside class="w-72 bg-green-900 text-white hidden md:flex flex-col">
-            <div class="p-6 border-b border-green-700">
-                <h1 class="text-2xl font-bold">SINTING-FT</h1>
-                <p class="text-sm text-green-200 mt-1">Dashboard Admin KPU</p>
-            </div>
-
-            <nav class="flex-1 p-4 space-y-2">
-                <a href="#dashboard" class="block px-4 py-3 rounded-xl bg-green-800 font-semibold">
-                    Dashboard
-                </a>
-                <a href="#kandidat" class="block px-4 py-3 rounded-xl hover:bg-green-800 transition">
-                    Kandidat & Hasil Suara
-                </a>
-                <a href="#dpt" class="block px-4 py-3 rounded-xl hover:bg-green-800 transition">
-                    Registrasi DPT Blockchain
-                </a>
-                <a href="#cek-pemilih" class="block px-4 py-3 rounded-xl hover:bg-green-800 transition">
-                    Cek Status Pemilih
-                </a>
-            </nav>
-
-            <div class="p-4 border-t border-green-700">
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <button type="submit" class="w-full px-4 py-3 bg-red-600 rounded-xl font-semibold hover:bg-red-700 transition">
-                        Logout
-                    </button>
-                </form>
-            </div>
-        </aside>
-
-        <main class="flex-1">
-
-            <header class="bg-white shadow-sm px-6 py-5 flex items-center justify-between">
-                <div>
-                    <h2 class="text-2xl font-bold text-gray-800">Dashboard Admin KPU</h2>
-                    <p class="text-gray-500">Selamat datang, {{ session('nama') }}</p>
-                </div>
-
-                <button
-                    onclick="connectWallet()"
-                    id="connectWalletBtn"
-                    {{ !$isContractConfigured ? 'disabled' : '' }}
-                    class="px-5 py-3 rounded-xl font-semibold transition
-                        {{ $isContractConfigured
-                            ? 'bg-green-800 text-white hover:bg-green-900'
-                            : 'bg-gray-300 text-gray-500 cursor-not-allowed' }}"
-                >
-                    {{ $isContractConfigured ? 'Connect Wallet' : 'Contract Belum Ada' }}
-                </button>
-            </header>
-
-            <div class="p-6 space-y-8">
-
-                <div id="alertBox" class="hidden px-5 py-4 rounded-xl font-medium"></div>
-
-                <section id="dashboard" class="grid grid-cols-1 md:grid-cols-4 gap-5">
-                    <div class="bg-white p-6 rounded-2xl shadow-sm">
-                        <p class="text-gray-500">Status Wallet</p>
-                        <h3 id="walletStatus" class="text-lg font-bold mt-2 text-gray-800">Belum terhubung</h3>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-2xl shadow-sm">
-                        <p class="text-gray-500">Wallet Admin SC</p>
-                        <h3 id="committeeAddress" class="text-sm font-bold mt-2 text-gray-800 break-all">-</h3>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-2xl shadow-sm">
-                        <p class="text-gray-500">Total Kandidat</p>
-                        <h3 id="totalCandidates" class="text-3xl font-bold mt-2 text-gray-800">0</h3>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-2xl shadow-sm">
-                        <p class="text-gray-500">Total Suara Masuk</p>
-                        <h3 id="totalVotes" class="text-3xl font-bold mt-2 text-gray-800">0</h3>
-                    </div>
-                </section>
-
-                <section class="bg-white p-6 rounded-2xl shadow-sm">
-                    <h3 class="text-xl font-bold text-gray-800 mb-4">Informasi Smart Contract</h3>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="p-4 bg-gray-100 rounded-xl">
-                            <p class="text-gray-500 text-sm">Contract Address</p>
-                            <p class="mt-3 mb-3 font-semibold break-all {{ $isContractConfigured ? 'text-gray-800' : 'text-red-600' }}" id="contractAddressText">
-                                {{ $isContractConfigured ? $contractAddress : 'Belum dikonfigurasi' }}
-                            </p>
-                            @if(!$isContractConfigured)
-                                <section class="bg-yellow-50 border border-yellow-300 p-6 rounded-2xl shadow-sm">
-                                    <h3 class="text-lg font-bold text-yellow-800">Smart Contract Belum Dikonfigurasi</h3>
-                                    <p class="text-yellow-700 mt-2">
-                                        Kami tidak menemukan alamat smart contract yang akan digunakan
-                                    </p>
-                                    <div class="mt-3 bg-yellow-100 text-yellow-900 px-4 py-3 rounded-xl font-mono text-sm">
-                                        Hubungi Teknisi Terkait Mengenai Kendala Pada Smart Contract ini
-                                    </div>
-                                </section>
-                            @endif
-                        </div>
-
-                        <div class="p-4 bg-gray-100 rounded-xl">
-                            <p class="text-gray-500 text-sm">Wallet Terhubung</p>
-                            <p class="font-semibold text-gray-800 break-all" id="connectedWallet">
-                                -
-                            </p>
-                        </div>
-                    </div>
-                </section>
-
-                <section id="kandidat" class="bg-white p-6 rounded-2xl shadow-sm">
-                    <div class="flex items-center justify-between mb-5">
-                        <div>
-                            <h3 class="text-xl font-bold text-gray-800">Kandidat & Hasil Suara</h3>
-                            <p class="text-gray-500">Data kandidat diambil langsung dari smart contract.</p>
-                        </div>
-
-                        <button
-                            onclick="loadCandidates()"
-                            {{ !$isContractConfigured ? 'disabled' : '' }}
-                            class="px-4 py-3 rounded-xl font-semibold transition
-                                {{ $isContractConfigured
-                                    ? 'bg-green-800 text-white hover:bg-green-900'
-                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed' }}"
-                        >
-                            Refresh
-                        </button>
-                    </div>
-
-                    <div class="overflow-x-auto">
-                        <table class="w-full border-collapse">
-                            <thead>
-                                <tr class="bg-gray-100 text-left">
-                                    <th class="p-4 rounded-l-xl">ID</th>
-                                    <th class="p-4">Nama Kandidat</th>
-                                    <th class="p-4 rounded-r-xl">Total Suara</th>
-                                </tr>
-                            </thead>
-                            <tbody id="candidateTable">
-                                <tr>
-                                    <td colspan="3" class="p-4 text-center text-gray-500">
-                                        Belum ada data. Hubungkan wallet lalu klik refresh.
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
-
-                <section id="dpt" class="bg-white p-6 rounded-2xl shadow-sm">
-                    <h3 class="text-xl font-bold text-gray-800">Registrasi DPT Blockchain</h3>
-                    <p class="text-gray-500 mt-1">
-                        Masukkan wallet address mahasiswa yang berhak voting. Aksi ini memanggil fungsi registerVoter().
-                    </p>
-
-                    <div class="mt-5 grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <input
-                            type="text"
-                            id="voterAddress"
-                            placeholder="0x wallet mahasiswa"
-                            class="md:col-span-3 px-5 py-4 rounded-xl bg-gray-100 outline-none focus:ring-2 focus:ring-green-800"
-                        >
-
-                        <button
-                            onclick="registerVoter()"
-                            {{ !$isContractConfigured ? 'disabled' : '' }}
-                            class="px-5 py-4 rounded-xl font-bold transition
-                                {{ $isContractConfigured
-                                    ? 'bg-green-800 text-white hover:bg-green-900'
-                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed' }}"
-                        >
-                            Daftarkan
-                        </button>
-                    </div>
-
-                    <div id="registerResult" class="mt-4 text-sm text-gray-600"></div>
-                </section>
-
-                <section id="cek-pemilih" class="bg-white p-6 rounded-2xl shadow-sm">
-                    <h3 class="text-xl font-bold text-gray-800">Cek Status Pemilih</h3>
-                    <p class="text-gray-500 mt-1">
-                        Cek apakah wallet mahasiswa sudah masuk DPT dan apakah sudah voting.
-                    </p>
-
-                    <div class="mt-5 grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <input
-                            type="text"
-                            id="checkAddress"
-                            placeholder="0x wallet mahasiswa"
-                            class="md:col-span-3 px-5 py-4 rounded-xl bg-gray-100 outline-none focus:ring-2 focus:ring-green-800"
-                        >
-
-                        <button
-                            onclick="checkVoterStatus()"
-                            {{ !$isContractConfigured ? 'disabled' : '' }}
-                            class="px-5 py-4 rounded-xl font-bold transition
-                                {{ $isContractConfigured
-                                    ? 'bg-blue-700 text-white hover:bg-blue-800'
-                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed' }}"
-                        >
-                            Cek Status
-                        </button>
-                    </div>
-
-                    <div id="checkResult" class="mt-5 grid grid-cols-1 md:grid-cols-2 gap-4 hidden">
-                        <div class="p-4 bg-gray-100 rounded-xl">
-                            <p class="text-gray-500 text-sm">Status DPT</p>
-                            <p id="eligibleStatus" class="text-lg font-bold text-gray-800">-</p>
-                        </div>
-
-                        <div class="p-4 bg-gray-100 rounded-xl">
-                            <p class="text-gray-500 text-sm">Status Voting</p>
-                            <p id="voteStatus" class="text-lg font-bold text-gray-800">-</p>
-                        </div>
-                    </div>
-                </section>
-
-            </div>
-        </main>
-    </div>
-
-    <script>
-        const CONTRACT_ADDRESS = @json($contractAddress);
-        const IS_CONTRACT_CONFIGURED = @json($isContractConfigured);
-
-        // SUDAH DIPERBAIKI: getTotalCandidates dihapus dari ABI
-        const ABI = [
-            "function committee() view returns (address)",
-            "function registerVoter(address _voter)",
-            "function isEligible(address) view returns (bool)",
-            "function alreadyVote(address) view returns (bool)",
-            "function getAllCandidates() view returns (tuple(uint256 id, string name, uint256 totalVote)[])",
-            "event VoteIn(address dompetPemilih, uint256 idKandidat)",
-            "event VoterRegistered(address dompetPemilih)"
-        ];
-
-        let provider;
-        let signer;
-        let contract;
-        let connectedAccount;
-
-        function showAlert(message, type = 'success') {
-            const alertBox = document.getElementById('alertBox');
-
-            alertBox.classList.remove('hidden', 'bg-green-100', 'text-green-700', 'bg-red-100', 'text-red-700', 'bg-yellow-100', 'text-yellow-700');
-
-            if (type === 'success') {
-                alertBox.classList.add('bg-green-100', 'text-green-700');
-            } else if (type === 'error') {
-                alertBox.classList.add('bg-red-100', 'text-red-700');
-            } else {
-                alertBox.classList.add('bg-yellow-100', 'text-yellow-700');
-            }
-
-            alertBox.innerText = message;
-        }
-
-        function isBlockchainReady() {
-            if (!IS_CONTRACT_CONFIGURED || !CONTRACT_ADDRESS) {
-                showAlert('Smart contract belum dikonfigurasi. Dashboard tetap bisa digunakan, tetapi fitur blockchain belum aktif.', 'warning');
-                return false;
-            }
-
-            if (!ethers.isAddress(CONTRACT_ADDRESS)) {
-                showAlert('Alamat smart contract tidak valid. Periksa kembali VOTING_CONTRACT_ADDRESS di file .env.', 'error');
-                return false;
-            }
-
-            return true;
-        }
-
-       async function connectWallet() {
-            try {
-                if (!isBlockchainReady()) {
-                    return;
-                }
-
-                if (!window.ethereum) {
-                    showAlert('MetaMask belum terpasang di browser.', 'error');
-                    return;
-                }
-
-                provider = new ethers.BrowserProvider(window.ethereum);
-                await provider.send("eth_requestAccounts", []);
-                signer = await provider.getSigner();
-                connectedAccount = await signer.getAddress();
-
-                contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
-
-                document.getElementById('connectedWallet').innerText = connectedAccount;
-                document.getElementById('walletStatus').innerText = 'Terhubung';
-                document.getElementById('connectWalletBtn').innerText = 'Wallet Terhubung';
-
-                await loadCommittee();
-                await loadCandidates();
-
-                showAlert('Wallet berhasil terhubung.', 'success');
-            } catch (error) {
-                console.error(error);
-                showAlert('Gagal menghubungkan wallet.', 'error');
-            }
-        }
-
-        async function loadCommittee() {
-            try {
-                if (!isBlockchainReady()) {
-                    return;
-                }
-                if (!contract) {
-                    showAlert('Hubungkan wallet terlebih dahulu.', 'warning');
-                    return;
-                }
-
-                const committee = await contract.committee();
-                document.getElementById('committeeAddress').innerText = committee;
-
-                if (committee.toLowerCase() !== connectedAccount.toLowerCase()) {
-                    showAlert('Wallet terhubung bukan wallet committee/admin smart contract. Register voter akan gagal jika wallet bukan admin.', 'warning');
-                }
-            } catch (error) {
-                console.error(error);
-                showAlert('Gagal mengambil data committee.', 'error');
-            }
-        }
-
-        // SUDAH DIPERBAIKI: Logika pengambilan data disesuaikan dengan getAllCandidates
-        async function loadCandidates() {
-            try {
-                if (!isBlockchainReady()) {
-                    return;
-                }
-                if (!contract) {
-                    showAlert('Hubungkan wallet terlebih dahulu.', 'warning');
-                    return;
-                }
-
-                // Hanya memanggil getAllCandidates yang memang ada di Smart Contract
-                const candidates = await contract.getAllCandidates();
-
-                // Menghitung total kandidat dari panjang array, bukan memanggil fungsi error
-                const totalCandidate = candidates.length;
-
-                let rows = '';
-                let totalVotes = 0;
-
-                candidates.forEach((candidate) => {
-                    const id = Number(candidate.id);
-                    const name = candidate.name;
-                    const totalVote = Number(candidate.totalVote);
-
-                    totalVotes += totalVote;
-
-                    rows += `
-                        <tr class="border-b">
-                            <td class="p-4 font-semibold">${id}</td>
-                            <td class="p-4">${name}</td>
-                            <td class="p-4 font-bold">${totalVote}</td>
-                        </tr>
-                    `;
-                });
-
-                if (rows === '') {
-                    rows = `
-                        <tr>
-                            <td colspan="3" class="p-4 text-center text-gray-500">
-                                Belum ada kandidat.
-                            </td>
-                        </tr>
-                    `;
-                }
-
-                document.getElementById('candidateTable').innerHTML = rows;
-                document.getElementById('totalCandidates').innerText = totalCandidate;
-                document.getElementById('totalVotes').innerText = totalVotes;
-
-            } catch (error) {
-                console.error(error);
-                showAlert('Gagal mengambil data kandidat.', 'error');
-            }
-        }
-
-        async function registerVoter() {
-            try {
-                if (!isBlockchainReady()) {
-                    return;
-                }
-                if (!contract) {
-                    showAlert('Hubungkan wallet admin terlebih dahulu.', 'warning');
-                    return;
-                }
-
-                const voterAddress = document.getElementById('voterAddress').value.trim();
-
-                if (!ethers.isAddress(voterAddress)) {
-                    showAlert('Alamat wallet pemilih tidak valid.', 'error');
-                    return;
-                }
-
-                const alreadyEligible = await contract.isEligible(voterAddress);
-
-                if (alreadyEligible) {
-                    showAlert('Wallet ini sudah terdaftar sebagai DPT.', 'warning');
-                    return;
-                }
-
-                document.getElementById('registerResult').innerText = 'Memproses transaksi register voter...';
-
-                const tx = await contract.registerVoter(voterAddress);
-                document.getElementById('registerResult').innerText = `Transaksi dikirim: ${tx.hash}`;
-
-                await tx.wait();
-
-                document.getElementById('registerResult').innerText = `Berhasil didaftarkan ke DPT. Tx Hash: ${tx.hash}`;
-                showAlert('Pemilih berhasil didaftarkan ke blockchain.', 'success');
-
-            } catch (error) {
-                console.error(error);
-
-                if (error.reason) {
-                    showAlert(error.reason, 'error');
-                } else if (error.shortMessage) {
-                    showAlert(error.shortMessage, 'error');
-                } else {
-                    showAlert('Gagal mendaftarkan pemilih. Pastikan wallet yang connect adalah committee/admin.', 'error');
-                }
-            }
-        }
-
-        async function checkVoterStatus() {
-            try {
-                if (!isBlockchainReady()) {
-                    return;
-                }
-                if (!contract) {
-                    showAlert('Hubungkan wallet terlebih dahulu.', 'warning');
-                    return;
-                }
-
-                const checkAddress = document.getElementById('checkAddress').value.trim();
-
-                if (!ethers.isAddress(checkAddress)) {
-                    showAlert('Alamat wallet tidak valid.', 'error');
-                    return;
-                }
-
-                const eligible = await contract.isEligible(checkAddress);
-                const voted = await contract.alreadyVote(checkAddress);
-
-                document.getElementById('checkResult').classList.remove('hidden');
-
-                document.getElementById('eligibleStatus').innerText = eligible
-                    ? 'Terdaftar di DPT'
-                    : 'Belum terdaftar di DPT';
-
-                document.getElementById('voteStatus').innerText = voted
-                    ? 'Sudah voting'
-                    : 'Belum voting';
-
-            } catch (error) {
-                console.error(error);
-                showAlert('Gagal mengecek status pemilih.', 'error');
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', function () {
-            if (!IS_CONTRACT_CONFIGURED || !CONTRACT_ADDRESS) {
-                document.getElementById('walletStatus').innerText = 'Contract belum ada';
-                document.getElementById('committeeAddress').innerText = '-';
-                document.getElementById('totalCandidates').innerText = '0';
-                document.getElementById('totalVotes').innerText = '0';
-
-                document.getElementById('candidateTable').innerHTML = `
-                    <tr>
-                        <td colspan="3" class="p-4 text-center text-gray-500">
-                            Data kandidat belum bisa dimuat karena smart contract belum dikonfigurasi.
-                        </td>
-                    </tr>
-                `;
-            }
-        });
-    </script>
-</body>
-</html> --}}
 <!DOCTYPE html>
 <html class="light" lang="id">
 <head>
@@ -661,23 +166,19 @@
 
                 <div class="flex flex-col sm:flex-row gap-sm sm:items-center">
                     <div class="flex items-center gap-sm bg-surface-container-low px-4 py-2 rounded-full border border-outline-variant/20">
-                        <span class="w-2 h-2 rounded-full {{ $isContractConfigured ? 'bg-green-500 animate-pulse' : 'bg-yellow-500' }}"></span>
+                        <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
                         <span class="font-label-md text-on-surface-variant">
-                            {{ $isContractConfigured ? 'Contract Ready' : 'Contract Belum Ada' }}
+                            Contract Ready
                         </span>
                     </div>
 
                     <button
                         onclick="connectWallet()"
                         id="connectWalletBtn"
-                        {{ !$isContractConfigured ? 'disabled' : '' }}
-                        class="px-5 py-3 rounded-xl font-semibold transition flex items-center justify-center gap-2
-                            {{ $isContractConfigured
-                                ? 'bg-primary text-on-primary hover:opacity-90 shadow-sm active:scale-95'
-                                : 'bg-surface-container-highest text-on-surface-variant cursor-not-allowed' }}"
+                        class="px-5 py-3 rounded-xl font-semibold transition flex items-center justify-center gap-2 bg-primary text-on-primary hover:opacity-90 shadow-sm active:scale-95"
                     >
                         <span class="material-symbols-outlined">account_balance_wallet</span>
-                        {{ $isContractConfigured ? 'Connect Wallet' : 'Contract Belum Ada' }}
+                        Connect Wallet
                     </button>
                 </div>
             </header>
@@ -730,11 +231,7 @@
 
                             <button
                                 onclick="loadCandidates()"
-                                {{ !$isContractConfigured ? 'disabled' : '' }}
-                                class="flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-label-md transition-all active:scale-95
-                                    {{ $isContractConfigured
-                                        ? 'bg-primary-container text-on-primary-container hover:bg-primary-container/80'
-                                        : 'bg-surface-container-highest text-on-surface-variant cursor-not-allowed' }}"
+                                class="flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-label-md transition-all active:scale-95 bg-primary-container text-on-primary-container hover:bg-primary-container/80"
                             >
                                 <span class="material-symbols-outlined text-md">refresh</span>
                                 Refresh
@@ -782,11 +279,7 @@
 
                             <button
                                 onclick="registerVoter()"
-                                {{ !$isContractConfigured ? 'disabled' : '' }}
-                                class="px-5 py-4 rounded-xl font-bold transition flex items-center justify-center gap-2
-                                    {{ $isContractConfigured
-                                        ? 'bg-secondary-container text-on-secondary-container shadow-sm hover:shadow-md active:scale-[0.98]'
-                                        : 'bg-surface-container-highest text-on-surface-variant cursor-not-allowed' }}"
+                                class="px-5 py-4 rounded-xl font-bold transition flex items-center justify-center gap-2 bg-secondary-container text-on-secondary-container shadow-sm hover:shadow-md active:scale-[0.98]"
                             >
                                 <span class="material-symbols-outlined">how_to_reg</span>
                                 Daftarkan
@@ -807,28 +300,16 @@
 
                             <p class="font-label-sm opacity-70 mb-1">Contract Address</p>
 
-                            <div id="contractAddressText" class="bg-white/10 p-4 rounded-xl break-all font-mono text-sm mb-4 border border-white/5 {{ $isContractConfigured ? '' : 'text-error-container' }}">
-                                {{ $isContractConfigured ? $contractAddress : 'Belum dikonfigurasi' }}
+                            <div id="contractAddressText" class="bg-white/10 p-4 rounded-xl break-all font-mono text-sm mb-4 border border-white/5">
+                                0xB4F95ca65dAaCebcf95A5Fdf57ed4FF7730e7555
                             </div>
-
-                            @if(!$isContractConfigured)
-                                <div class="bg-yellow-100/10 border border-yellow-200/20 p-4 rounded-xl mb-4">
-                                    <h4 class="font-bold text-yellow-100">Smart Contract Belum Dikonfigurasi</h4>
-                                    <p class="text-yellow-50/80 mt-2 text-sm">
-                                        Kami tidak menemukan alamat smart contract yang akan digunakan.
-                                    </p>
-                                    <div class="mt-3 bg-yellow-100/10 text-yellow-50 px-4 py-3 rounded-xl font-mono text-xs">
-                                        Hubungi teknisi terkait mengenai kendala pada smart contract ini.
-                                    </div>
-                                </div>
-                            @endif
 
                             <div class="flex flex-col gap-2 text-xs opacity-80">
                                 <div class="flex justify-between items-center gap-4">
-                                    <span>Network: FT-Chain</span>
+                                    <span>Network: FT-Chain (Sepolia)</span>
                                     <span class="flex items-center gap-1">
-                                        <span class="w-2 h-2 rounded-full {{ $isContractConfigured ? 'bg-green-400' : 'bg-yellow-400' }}"></span>
-                                        {{ $isContractConfigured ? 'Configured' : 'Pending' }}
+                                        <span class="w-2 h-2 rounded-full bg-green-400"></span>
+                                        Configured
                                     </span>
                                 </div>
 
@@ -861,11 +342,7 @@
 
                             <button
                                 onclick="checkVoterStatus()"
-                                {{ !$isContractConfigured ? 'disabled' : '' }}
-                                class="w-full font-label-md py-3 rounded-xl transition-colors flex items-center justify-center gap-2
-                                    {{ $isContractConfigured
-                                        ? 'bg-surface-container-highest text-on-surface hover:bg-surface-variant'
-                                        : 'bg-surface-container-highest text-on-surface-variant cursor-not-allowed' }}"
+                                class="w-full font-label-md py-3 rounded-xl transition-colors flex items-center justify-center gap-2 bg-surface-container-highest text-on-surface hover:bg-surface-variant"
                             >
                                 <span class="material-symbols-outlined">verified_user</span>
                                 Periksa Status
@@ -909,17 +386,228 @@
     </div>
 
     <script>
-        const CONTRACT_ADDRESS = @json($contractAddress);
-        const IS_CONTRACT_CONFIGURED = @json($isContractConfigured);
+        const CONTRACT_ADDRESS = "0xB4F95ca65dAaCebcf95A5Fdf57ed4FF7730e7555";
+        const IS_CONTRACT_CONFIGURED = true;
 
         const ABI = [
-            "function committee() view returns (address)",
-            "function registerVoter(address _voter)",
-            "function isEligible(address) view returns (bool)",
-            "function alreadyVote(address) view returns (bool)",
-            "function getAllCandidates() view returns (tuple(uint256 id, string name, uint256 totalVote)[])",
-            "event VoteIn(address dompetPemilih, uint256 idKandidat)",
-            "event VoterRegistered(address dompetPemilih)"
+            {
+            "inputs": [],
+            "stateMutability": "nonpayable",
+            "type": "constructor"
+            },
+            {
+            "anonymous": false,
+            "inputs": [
+                {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "id",
+                "type": "uint256"
+                },
+                {
+                "indexed": false,
+                "internalType": "string",
+                "name": "name",
+                "type": "string"
+                }
+            ],
+            "name": "CandidateAdded",
+            "type": "event"
+            },
+            {
+            "anonymous": false,
+            "inputs": [
+                {
+                "indexed": false,
+                "internalType": "address",
+                "name": "dompetPemilih",
+                "type": "address"
+                },
+                {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "idKandidat",
+                "type": "uint256"
+                }
+            ],
+            "name": "VoteIn",
+            "type": "event"
+            },
+            {
+            "anonymous": false,
+            "inputs": [
+                {
+                "indexed": false,
+                "internalType": "address",
+                "name": "dompetPemilih",
+                "type": "address"
+                }
+            ],
+            "name": "VoterRegistered",
+            "type": "event"
+            },
+            {
+            "inputs": [
+                {
+                "internalType": "string",
+                "name": "_name",
+                "type": "string"
+                }
+            ],
+            "name": "addCandidate",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+            },
+            {
+            "inputs": [
+                {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+                }
+            ],
+            "name": "alreadyVote",
+            "outputs": [
+                {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+            },
+            {
+            "inputs": [
+                {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+                }
+            ],
+            "name": "candidateList",
+            "outputs": [
+                {
+                "internalType": "uint256",
+                "name": "id",
+                "type": "uint256"
+                },
+                {
+                "internalType": "string",
+                "name": "name",
+                "type": "string"
+                },
+                {
+                "internalType": "uint256",
+                "name": "totalVote",
+                "type": "uint256"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+            },
+            {
+            "inputs": [],
+            "name": "committee",
+            "outputs": [
+                {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+            },
+            {
+            "inputs": [],
+            "name": "getAllCandidates",
+            "outputs": [
+                {
+                "components": [
+                    {
+                    "internalType": "uint256",
+                    "name": "id",
+                    "type": "uint256"
+                    },
+                    {
+                    "internalType": "string",
+                    "name": "name",
+                    "type": "string"
+                    },
+                    {
+                    "internalType": "uint256",
+                    "name": "totalVote",
+                    "type": "uint256"
+                    }
+                ],
+                "internalType": "struct TingTingVoting.Candidate[]",
+                "name": "",
+                "type": "tuple[]"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+            },
+            {
+            "inputs": [],
+            "name": "getTotalCandidates",
+            "outputs": [
+                {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+            },
+            {
+            "inputs": [
+                {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+                }
+            ],
+            "name": "isEligible",
+            "outputs": [
+                {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+            },
+            {
+            "inputs": [
+                {
+                "internalType": "address",
+                "name": "_voter",
+                "type": "address"
+                }
+            ],
+            "name": "registerVoter",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+            },
+            {
+            "inputs": [
+                {
+                "internalType": "uint256",
+                "name": "_idKandidat",
+                "type": "uint256"
+                }
+            ],
+            "name": "vote",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+            }
         ];
 
         let provider;
@@ -946,28 +634,11 @@
             }
 
             alertBox.innerText = message;
-        }
-
-        function isBlockchainReady() {
-            if (!IS_CONTRACT_CONFIGURED || !CONTRACT_ADDRESS) {
-                showAlert('Smart contract belum dikonfigurasi. Dashboard tetap bisa digunakan, tetapi fitur blockchain belum aktif.', 'warning');
-                return false;
-            }
-
-            if (!ethers.isAddress(CONTRACT_ADDRESS)) {
-                showAlert('Alamat smart contract tidak valid. Periksa kembali VOTING_CONTRACT_ADDRESS di file .env.', 'error');
-                return false;
-            }
-
-            return true;
+            alertBox.classList.remove('hidden');
         }
 
         async function connectWallet() {
             try {
-                if (!isBlockchainReady()) {
-                    return;
-                }
-
                 if (!window.ethereum) {
                     showAlert('MetaMask belum terpasang di browser.', 'error');
                     return;
@@ -985,7 +656,7 @@
                 document.getElementById('connectWalletBtn').innerHTML = '<span class="material-symbols-outlined">account_balance_wallet</span> Wallet Terhubung';
 
                 const walletBadge = document.getElementById('walletBadge');
-                walletBadge.innerText = 'Terhubung';
+                walletBadge.innerText = 'Online';
                 walletBadge.classList.remove('bg-yellow-100', 'text-yellow-700');
                 walletBadge.classList.add('bg-green-100', 'text-green-700');
 
@@ -1001,10 +672,6 @@
 
         async function loadCommittee() {
             try {
-                if (!isBlockchainReady()) {
-                    return;
-                }
-
                 if (!contract) {
                     showAlert('Hubungkan wallet terlebih dahulu.', 'warning');
                     return;
@@ -1024,10 +691,6 @@
 
         async function loadCandidates() {
             try {
-                if (!isBlockchainReady()) {
-                    return;
-                }
-
                 if (!contract) {
                     showAlert('Hubungkan wallet terlebih dahulu.', 'warning');
                     return;
@@ -1070,7 +733,7 @@
                     rows = `
                         <tr>
                             <td colspan="4" class="px-lg py-lg text-center text-on-surface-variant">
-                                Belum ada kandidat.
+                                Belum ada kandidat. Admin harus mendaftarkan kandidat terlebih dahulu.
                             </td>
                         </tr>
                     `;
@@ -1088,10 +751,6 @@
 
         async function registerVoter() {
             try {
-                if (!isBlockchainReady()) {
-                    return;
-                }
-
                 if (!contract) {
                     showAlert('Hubungkan wallet admin terlebih dahulu.', 'warning');
                     return;
@@ -1136,10 +795,6 @@
 
         async function checkVoterStatus() {
             try {
-                if (!isBlockchainReady()) {
-                    return;
-                }
-
                 if (!contract) {
                     showAlert('Hubungkan wallet terlebih dahulu.', 'warning');
                     return;
@@ -1170,23 +825,6 @@
                 showAlert('Gagal mengecek status pemilih.', 'error');
             }
         }
-
-        document.addEventListener('DOMContentLoaded', function () {
-            if (!IS_CONTRACT_CONFIGURED || !CONTRACT_ADDRESS) {
-                document.getElementById('walletStatus').innerText = 'Contract belum ada';
-                document.getElementById('committeeAddress').innerText = '-';
-                document.getElementById('totalCandidates').innerText = '0';
-                document.getElementById('totalVotes').innerText = '0';
-
-                document.getElementById('candidateTable').innerHTML = `
-                    <tr>
-                        <td colspan="4" class="px-lg py-lg text-center text-on-surface-variant">
-                            Data kandidat belum bisa dimuat karena smart contract belum dikonfigurasi.
-                        </td>
-                    </tr>
-                `;
-            }
-        });
     </script>
 </body>
 </html>
