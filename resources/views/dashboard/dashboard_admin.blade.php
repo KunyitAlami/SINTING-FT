@@ -135,9 +135,14 @@
                     <span class="font-label-md">Kandidat & Hasil Suara</span>
                 </a>
 
+                <a class="text-on-surface-variant px-4 py-3 flex items-center gap-3 hover:bg-surface-container rounded-xl transition-all hover:translate-x-1 duration-200" href="#tambah-kandidat">
+                    <span class="material-symbols-outlined">person_add</span>
+                    <span class="font-label-md">Tambah Kandidat</span>
+                </a>
+
                 <a class="text-on-surface-variant px-4 py-3 flex items-center gap-3 hover:bg-surface-container rounded-xl transition-all hover:translate-x-1 duration-200" href="#dpt">
                     <span class="material-symbols-outlined">how_to_reg</span>
-                    <span class="font-label-md">Registrasi DPT Blockchain</span>
+                    <span class="font-label-md">Registrasi DPT</span>
                 </a>
 
                 <a class="text-on-surface-variant px-4 py-3 flex items-center gap-3 hover:bg-surface-container rounded-xl transition-all hover:translate-x-1 duration-200" href="#cek-pemilih">
@@ -258,6 +263,35 @@
                                 </tbody>
                             </table>
                         </div>
+                    </section>
+
+                    <section id="tambah-kandidat" class="glass-card p-lg rounded-2xl shadow-sm">
+                        <div class="flex items-center gap-3 mb-md">
+                            <span class="material-symbols-outlined text-primary">person_add</span>
+                            <div>
+                                <h3 class="font-headline-md text-2xl font-bold text-on-surface">Tambah Kandidat Baru</h3>
+                                <p class="font-body-md text-on-surface-variant">Masukkan nama kandidat ke dalam smart contract. Aksi ini memanggil fungsi addCandidate().</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-md">
+                            <input
+                                type="text"
+                                id="candidateName"
+                                placeholder="Nama Kandidat (misal: Budi & Siti)"
+                                class="md:col-span-3 w-full bg-surface border border-outline-variant/30 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary-container focus:border-primary transition-all"
+                            >
+
+                            <button
+                                onclick="addCandidateFunc()"
+                                class="px-5 py-4 rounded-xl font-bold transition flex items-center justify-center gap-2 bg-secondary-container text-on-secondary-container shadow-sm hover:shadow-md active:scale-[0.98]"
+                            >
+                                <span class="material-symbols-outlined">person_add</span>
+                                Tambah
+                            </button>
+                        </div>
+
+                        <div id="addCandidateResult" class="mt-4 text-sm text-on-surface-variant"></div>
                     </section>
 
                     <section id="dpt" class="glass-card p-lg rounded-2xl shadow-sm">
@@ -681,7 +715,7 @@
                 document.getElementById('committeeAddress').innerText = committee;
 
                 if (committee.toLowerCase() !== connectedAccount.toLowerCase()) {
-                    showAlert('Wallet terhubung bukan wallet committee/admin smart contract. Register voter akan gagal jika wallet bukan admin.', 'warning');
+                    showAlert('Wallet terhubung bukan wallet committee/admin smart contract. Aksi akan gagal jika wallet bukan admin.', 'warning');
                 }
             } catch (error) {
                 console.error(error);
@@ -746,6 +780,46 @@
             } catch (error) {
                 console.error(error);
                 showAlert('Gagal mengambil data kandidat.', 'error');
+            }
+        }
+
+        // FUNGSI BARU UNTUK MENAMBAH KANDIDAT
+        async function addCandidateFunc() {
+            try {
+                if (!contract) {
+                    showAlert('Hubungkan wallet admin terlebih dahulu.', 'warning');
+                    return;
+                }
+
+                const nameInput = document.getElementById('candidateName').value.trim();
+
+                if (nameInput === "") {
+                    showAlert('Nama kandidat tidak boleh kosong.', 'error');
+                    return;
+                }
+
+                document.getElementById('addCandidateResult').innerText = 'Memproses transaksi tambah kandidat...';
+
+                const tx = await contract.addCandidate(nameInput);
+                document.getElementById('addCandidateResult').innerText = `Transaksi dikirim: ${tx.hash}`;
+
+                await tx.wait();
+
+                document.getElementById('addCandidateResult').innerText = `Berhasil ditambahkan. Tx Hash: ${tx.hash}`;
+                showAlert('Kandidat berhasil ditambahkan ke blockchain!', 'success');
+
+                document.getElementById('candidateName').value = '';
+                await loadCandidates();
+
+            } catch (error) {
+                console.error(error);
+                if (error.reason) {
+                    showAlert(error.reason, 'error');
+                } else if (error.shortMessage) {
+                    showAlert(error.shortMessage, 'error');
+                } else {
+                    showAlert('Gagal menambah kandidat. Pastikan wallet yang connect adalah committee/admin.', 'error');
+                }
             }
         }
 
