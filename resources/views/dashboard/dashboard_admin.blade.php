@@ -270,24 +270,38 @@
                             <span class="material-symbols-outlined text-primary">person_add</span>
                             <div>
                                 <h3 class="font-headline-md text-2xl font-bold text-on-surface">Tambah Kandidat Baru</h3>
-                                <p class="font-body-md text-on-surface-variant">Masukkan nama kandidat ke dalam smart contract. Aksi ini memanggil fungsi addCandidate().</p>
+                                <p class="font-body-md text-on-surface-variant">Masukkan nama, visi, dan misi kandidat ke dalam smart contract. Aksi ini memanggil fungsi addCandidate().</p>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-md">
+                        <div class="flex flex-col gap-4 mt-5">
                             <input
                                 type="text"
                                 id="candidateName"
                                 placeholder="Nama Kandidat (misal: Budi & Siti)"
-                                class="md:col-span-3 w-full bg-surface border border-outline-variant/30 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary-container focus:border-primary transition-all"
+                                class="w-full bg-surface border border-outline-variant/30 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary-container focus:border-primary transition-all"
                             >
+
+                            <textarea
+                                id="candidateVision"
+                                placeholder="Visi Kandidat..."
+                                rows="2"
+                                class="w-full bg-surface border border-outline-variant/30 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary-container focus:border-primary transition-all resize-none"
+                            ></textarea>
+
+                            <textarea
+                                id="candidateMission"
+                                placeholder="Misi Kandidat..."
+                                rows="3"
+                                class="w-full bg-surface border border-outline-variant/30 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary-container focus:border-primary transition-all resize-none"
+                            ></textarea>
 
                             <button
                                 onclick="addCandidateFunc()"
-                                class="px-5 py-4 rounded-xl font-bold transition flex items-center justify-center gap-2 bg-secondary-container text-on-secondary-container shadow-sm hover:shadow-md active:scale-[0.98]"
+                                class="w-full py-4 rounded-xl font-bold transition flex items-center justify-center gap-2 bg-secondary-container text-on-secondary-container shadow-sm hover:shadow-md active:scale-[0.98]"
                             >
                                 <span class="material-symbols-outlined">person_add</span>
-                                Tambah
+                                Tambah Kandidat
                             </button>
                         </div>
 
@@ -335,7 +349,7 @@
                             <p class="font-label-sm opacity-70 mb-1">Contract Address</p>
 
                             <div id="contractAddressText" class="bg-white/10 p-4 rounded-xl break-all font-mono text-sm mb-4 border border-white/5">
-                                0xB4F95ca65dAaCebcf95A5Fdf57ed4FF7730e7555
+                                0x427dC08BA46192024ceAdeD224f3251bFB8c3fBB
                             </div>
 
                             <div class="flex flex-col gap-2 text-xs opacity-80">
@@ -420,7 +434,7 @@
     </div>
 
     <script>
-        const CONTRACT_ADDRESS = "0xB4F95ca65dAaCebcf95A5Fdf57ed4FF7730e7555";
+        const CONTRACT_ADDRESS = "0x427dC08BA46192024ceAdeD224f3251bFB8c3fBB";
         const IS_CONTRACT_CONFIGURED = true;
 
         const ABI = [
@@ -442,6 +456,18 @@
                 "indexed": false,
                 "internalType": "string",
                 "name": "name",
+                "type": "string"
+                },
+                {
+                "indexed": false,
+                "internalType": "string",
+                "name": "vision",
+                "type": "string"
+                },
+                {
+                "indexed": false,
+                "internalType": "string",
+                "name": "mission",
                 "type": "string"
                 }
             ],
@@ -485,6 +511,16 @@
                 {
                 "internalType": "string",
                 "name": "_name",
+                "type": "string"
+                },
+                {
+                "internalType": "string",
+                "name": "_vision",
+                "type": "string"
+                },
+                {
+                "internalType": "string",
+                "name": "_mission",
                 "type": "string"
                 }
             ],
@@ -533,6 +569,16 @@
                 "type": "string"
                 },
                 {
+                "internalType": "string",
+                "name": "vision",
+                "type": "string"
+                },
+                {
+                "internalType": "string",
+                "name": "mission",
+                "type": "string"
+                },
+                {
                 "internalType": "uint256",
                 "name": "totalVote",
                 "type": "uint256"
@@ -568,6 +614,16 @@
                     {
                     "internalType": "string",
                     "name": "name",
+                    "type": "string"
+                    },
+                    {
+                    "internalType": "string",
+                    "name": "vision",
+                    "type": "string"
+                    },
+                    {
+                    "internalType": "string",
+                    "name": "mission",
                     "type": "string"
                     },
                     {
@@ -783,7 +839,7 @@
             }
         }
 
-        // FUNGSI BARU UNTUK MENAMBAH KANDIDAT
+        // FUNGSI JAVASCRIPT YANG DIUPDATE
         async function addCandidateFunc() {
             try {
                 if (!contract) {
@@ -792,15 +848,18 @@
                 }
 
                 const nameInput = document.getElementById('candidateName').value.trim();
+                const visionInput = document.getElementById('candidateVision').value.trim();
+                const missionInput = document.getElementById('candidateMission').value.trim();
 
-                if (nameInput === "") {
-                    showAlert('Nama kandidat tidak boleh kosong.', 'error');
+                if (nameInput === "" || visionInput === "" || missionInput === "") {
+                    showAlert('Nama, Visi, dan Misi kandidat tidak boleh kosong.', 'error');
                     return;
                 }
 
                 document.getElementById('addCandidateResult').innerText = 'Memproses transaksi tambah kandidat...';
 
-                const tx = await contract.addCandidate(nameInput);
+                // Fungsi dipanggil dengan 3 parameter
+                const tx = await contract.addCandidate(nameInput, visionInput, missionInput);
                 document.getElementById('addCandidateResult').innerText = `Transaksi dikirim: ${tx.hash}`;
 
                 await tx.wait();
@@ -808,7 +867,11 @@
                 document.getElementById('addCandidateResult').innerText = `Berhasil ditambahkan. Tx Hash: ${tx.hash}`;
                 showAlert('Kandidat berhasil ditambahkan ke blockchain!', 'success');
 
+                // Kosongkan form setelah sukses
                 document.getElementById('candidateName').value = '';
+                document.getElementById('candidateVision').value = '';
+                document.getElementById('candidateMission').value = '';
+
                 await loadCandidates();
 
             } catch (error) {

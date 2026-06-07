@@ -262,7 +262,7 @@
                         <p class="font-label-sm opacity-70 mb-1">Contract Address</p>
 
                         <div class="bg-white/10 p-4 rounded-xl break-all font-mono text-sm mb-4 border border-white/5" id="uiContractAddress">
-                            0xB4F95ca65dAaCebcf95A5Fdf57ed4FF7730e7555
+                            0x427dC08BA46192024ceAdeD224f3251bFB8c3fBB
                         </div>
 
                         <div class="flex justify-between items-center text-xs opacity-80">
@@ -362,10 +362,8 @@
     </footer>
 
     <script>
-        // CONTRACT BARU HASIL UPDATE TEMANMU
-        const CONTRACT_ADDRESS = "0xB4F95ca65dAaCebcf95A5Fdf57ed4FF7730e7555";
+        const CONTRACT_ADDRESS = "0x427dC08BA46192024ceAdeD224f3251bFB8c3fBB";
 
-        // ABI TERBARU LENGKAP
         const ABI = [
             {
             "inputs": [],
@@ -385,6 +383,18 @@
                 "indexed": false,
                 "internalType": "string",
                 "name": "name",
+                "type": "string"
+                },
+                {
+                "indexed": false,
+                "internalType": "string",
+                "name": "vision",
+                "type": "string"
+                },
+                {
+                "indexed": false,
+                "internalType": "string",
+                "name": "mission",
                 "type": "string"
                 }
             ],
@@ -428,6 +438,16 @@
                 {
                 "internalType": "string",
                 "name": "_name",
+                "type": "string"
+                },
+                {
+                "internalType": "string",
+                "name": "_vision",
+                "type": "string"
+                },
+                {
+                "internalType": "string",
+                "name": "_mission",
                 "type": "string"
                 }
             ],
@@ -476,6 +496,16 @@
                 "type": "string"
                 },
                 {
+                "internalType": "string",
+                "name": "vision",
+                "type": "string"
+                },
+                {
+                "internalType": "string",
+                "name": "mission",
+                "type": "string"
+                },
+                {
                 "internalType": "uint256",
                 "name": "totalVote",
                 "type": "uint256"
@@ -511,6 +541,16 @@
                     {
                     "internalType": "string",
                     "name": "name",
+                    "type": "string"
+                    },
+                    {
+                    "internalType": "string",
+                    "name": "vision",
+                    "type": "string"
+                    },
+                    {
+                    "internalType": "string",
+                    "name": "mission",
                     "type": "string"
                     },
                     {
@@ -758,6 +798,8 @@
                 candidates.forEach((candidate, index) => {
                     const id = Number(candidate.id);
                     const name = candidate.name;
+                    const vision = candidate.vision;
+                    const mission = candidate.mission;
                     const totalVote = Number(candidate.totalVote ?? 0);
                     const candidateNumber = String(index + 1).padStart(2, '0');
                     const isDisabled = isVoted || !isEligible;
@@ -791,17 +833,18 @@
                                 </div>
                             </div>
 
-                            <div class="p-xl">
+                            <div class="p-xl flex flex-col h-full">
                                 <h3 class="font-headline-md text-2xl font-bold text-on-surface mb-sm">${name}</h3>
 
-                                <p class="font-body-md text-on-surface-variant mb-xl line-clamp-3">
-                                    Kandidat Ketua Himpunan Mahasiswa. Detail visi dan misi dapat ditambahkan dari database atau smart contract jika struktur data kandidat sudah diperluas.
-                                </p>
+                                <div class="font-body-md text-on-surface-variant mb-xl text-sm line-clamp-3">
+                                    <p><strong>Visi:</strong> ${vision}</p>
+                                    <p class="mt-2"><strong>Misi:</strong> ${mission}</p>
+                                </div>
 
                                 <div class="flex items-center justify-between gap-md mt-auto">
                                     <button
                                         type="button"
-                                        onclick="showAlert('Fitur detail visi kandidat dapat dihubungkan ke database Laravel.', 'warning')"
+                                        onclick="showAlert('Visi: ${vision.replace(/'/g, "\\'")} \\n\\nMisi: ${mission.replace(/'/g, "\\'")}', 'success')"
                                         class="flex-1 border border-primary text-primary font-bold py-md rounded-xl hover:bg-surface-container-low transition-colors font-label-md"
                                     >
                                         Detail Visi

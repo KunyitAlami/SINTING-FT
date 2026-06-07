@@ -124,10 +124,7 @@
             <a class="text-on-surface-variant dark:text-on-surface-variant font-medium hover:text-primary transition-colors duration-200 font-label-md text-label-md" href="#">Registrasi</a>
             <a class="text-on-surface-variant dark:text-on-surface-variant font-medium hover:text-primary transition-colors duration-200 font-label-md text-label-md" href="#">Admin</a>
         </nav>
-        <button class="bg-primary-container text-on-primary-container px-6 py-2.5 rounded-full font-label-md text-label-md font-bold hover:opacity-90 active:scale-95 transition-all duration-150 shadow-sm flex items-center gap-2">
-            <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">account_balance_wallet</span>
-            Connect Wallet
-        </button>
+        <div class="w-[180px] hidden md:block"></div>
     </header>
 
     <main class="flex-grow flex flex-col pt-20">

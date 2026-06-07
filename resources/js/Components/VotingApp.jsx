@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserProvider, Contract } from 'ethers';
 
-// import file abi
+// import file abi (PASTIKAN FILE INI SUDAH DIUPDATE DENGAN ABI TERBARU!)
 import TingTingArtifact from '../contracts/TingTingVoting.json';
 
-const CONTRACT_ADDRESS = "0xB4F95ca65dAaCebcf95A5Fdf57ed4FF7730e7555";
+// ALAMAT CONTRACT BARU
+const CONTRACT_ADDRESS = "0x427dC08BA46192024ceAdeD224f3251bFB8c3fBB";
 const CONTRACT_ABI = TingTingArtifact.abi;
 
 export default function VotingApp() {
@@ -52,19 +53,21 @@ export default function VotingApp() {
             const provider = new BrowserProvider(window.ethereum);
             const contract = new Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
 
-            // KEMBALI MENGGUNAKAN getAllCandidates KARENA SUDAH ADA DI ABI
             const data = await contract.getAllCandidates();
 
+            // MAPPING DATA BARU (Sekarang ada vision dan mission)
             const formattedCandidates = data.map(kandidat => ({
                 id: kandidat.id.toString(),
                 name: kandidat.name,
+                vision: kandidat.vision,
+                mission: kandidat.mission,
                 totalVote: kandidat.totalVote.toString()
             }));
 
             setCandidates(formattedCandidates);
         } catch (error) {
             console.error("Gagal memuat:", error);
-            setErrorMsg("Gagal memuat data kandidat.");
+            setErrorMsg("Gagal memuat data kandidat. Pastikan ABI sudah di-update!");
         } finally {
             setIsLoading(false);
         }
@@ -128,22 +131,31 @@ export default function VotingApp() {
                     {isLoading ? (
                         <p className="text-blue-500 italic font-medium">⏳ Sedang mengambil data dari Blockchain Sepolia...</p>
                     ) : candidates.length === 0 ? (
-                        <p className="text-red-500 italic font-medium">⚠️ Belum ada data kandidat. Suruh Orang 1 input data dulu!</p>
+                        <p className="text-red-500 italic font-medium">⚠️ Belum ada data kandidat. Suruh Admin input data dulu!</p>
                     ) : (
                         <div className="grid gap-4">
                             {candidates.map((kandidat) => (
-                                <div key={kandidat.id} className="flex justify-between items-center p-4 border rounded shadow-sm">
-                                    <div>
-                                        <p className="font-bold text-lg text-gray-800">{kandidat.name}</p>
-                                        <p className="text-sm text-gray-600">Total Suara: {kandidat.totalVote}</p>
+                                <div key={kandidat.id} className="flex flex-col p-4 border rounded shadow-sm gap-4">
+                                    {/* Bagian Nama, Total Suara & Tombol Vote */}
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <p className="font-bold text-lg text-gray-800">{kandidat.name}</p>
+                                            <p className="text-sm text-gray-600 font-semibold">Total Suara: {kandidat.totalVote}</p>
+                                        </div>
+                                        <button
+                                            onClick={() => castVote(kandidat.id)}
+                                            disabled={isVoting}
+                                            className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold py-2 px-6 rounded"
+                                        >
+                                            {isVoting ? "Proses..." : "Vote"}
+                                        </button>
                                     </div>
-                                    <button
-                                        onClick={() => castVote(kandidat.id)}
-                                        disabled={isVoting}
-                                        className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold py-2 px-6 rounded"
-                                    >
-                                        {isVoting ? "Proses..." : "Vote"}
-                                    </button>
+
+                                    {/* Bagian Tampilan Visi & Misi */}
+                                    <div className="bg-gray-50 p-3 rounded border border-gray-100 text-sm text-gray-700">
+                                        <p className="mb-2"><span className="font-bold text-gray-800">Visi:</span><br/>{kandidat.vision}</p>
+                                        <p><span className="font-bold text-gray-800">Misi:</span><br/>{kandidat.mission}</p>
+                                    </div>
                                 </div>
                             ))}
                         </div>

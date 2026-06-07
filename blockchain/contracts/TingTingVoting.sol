@@ -4,7 +4,8 @@ pragma solidity ^0.8.24;
 contract TingTingVoting {
     event VoteIn(address dompetPemilih, uint256 idKandidat);
     event VoterRegistered(address dompetPemilih);
-    event CandidateAdded(uint256 id, string name);
+    // 👈 Event diperbarui untuk membawa data visi & misi
+    event CandidateAdded(uint256 id, string name, string vision, string mission);
 
     mapping(address => bool) public alreadyVote;
     mapping(address => bool) public isEligible;
@@ -14,6 +15,8 @@ contract TingTingVoting {
     struct Candidate {
         uint256 id;
         string name;
+        string vision;
+        string mission;
         uint256 totalVote;
     }
 
@@ -34,12 +37,12 @@ contract TingTingVoting {
         committee = msg.sender;
     }
 
-    function addCandidate(string memory _name) public onlyCommittee {
+    function addCandidate(string memory _name, string memory _vision, string memory _mission) public onlyCommittee {
         uint256 newCandidateId = candidateList.length;
 
-        candidateList.push(Candidate(newCandidateId, _name, 0));
+        candidateList.push(Candidate(newCandidateId, _name, _vision, _mission, 0));
 
-        emit CandidateAdded(newCandidateId, _name);
+        emit CandidateAdded(newCandidateId, _name, _vision, _mission);
     }
 
     function registerVoter(address _voter) public onlyCommittee {
