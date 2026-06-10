@@ -15,8 +15,8 @@ contract TingTingVoting {
     struct Candidate {
         uint256 id;
         string name;
-        string vision;  
-        string mission; 
+        string vision;
+        string mission;
         uint256 totalVote;
     }
 
