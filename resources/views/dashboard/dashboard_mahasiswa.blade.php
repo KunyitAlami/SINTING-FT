@@ -122,6 +122,14 @@
             backdrop-filter: blur(12px);
             border: 1px solid rgba(189, 200, 209, 0.35);
         }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #cfdaf2;
+            border-radius: 10px;
+        }
     </style>
 </head>
 
@@ -798,11 +806,15 @@
                 candidates.forEach((candidate, index) => {
                     const id = Number(candidate.id);
                     const name = candidate.name;
-                    const vision = candidate.vision;
-                    const mission = candidate.mission;
+                    const vision = candidate.vision || "-";
+                    const mission = candidate.mission || "-";
                     const totalVote = Number(candidate.totalVote ?? 0);
                     const candidateNumber = String(index + 1).padStart(2, '0');
                     const isDisabled = isVoted || !isEligible;
+
+                    // Mencegah error HTML saat data memiliki karakter ENTER / kutip
+                    const safeVisionAlert = vision.replace(/'/g, "\\'").replace(/"/g, "&quot;").replace(/(\r\n|\n|\r)/gm, "\\n");
+                    const safeMissionAlert = mission.replace(/'/g, "\\'").replace(/"/g, "&quot;").replace(/(\r\n|\n|\r)/gm, "\\n");
 
                     let buttonText = 'Pilih Kandidat';
                     let buttonClass = 'bg-secondary-container text-on-secondary-container shadow-lg hover:brightness-105 active:scale-95';
@@ -816,8 +828,8 @@
                     }
 
                     cardsHtml += `
-                        <div class="group bg-white rounded-2xl border border-outline-variant/10 shadow-sm overflow-hidden hover:shadow-xl transition-all duration-300">
-                            <div class="relative h-64 bg-surface-container-low flex items-center justify-center">
+                        <div class="group bg-white rounded-2xl border border-outline-variant/10 shadow-sm overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col">
+                            <div class="relative h-64 bg-surface-container-low flex items-center justify-center shrink-0">
                                 <div class="absolute inset-0 bg-gradient-to-br from-primary-fixed via-surface-container-low to-secondary-fixed opacity-80"></div>
 
                                 <div class="relative z-10 w-28 h-28 rounded-full bg-white/90 shadow-lg flex items-center justify-center">
@@ -833,23 +845,15 @@
                                 </div>
                             </div>
 
-                            <div class="p-xl flex flex-col h-full">
+                            <div class="p-xl flex flex-col flex-grow">
                                 <h3 class="font-headline-md text-2xl font-bold text-on-surface mb-sm">${name}</h3>
 
-                                <div class="font-body-md text-on-surface-variant mb-xl text-sm line-clamp-3">
+                                <div class="font-body-md text-on-surface-variant mb-md text-sm max-h-[240px] overflow-y-auto pr-2 custom-scrollbar whitespace-pre-wrap">
                                     <p><strong>Visi:</strong> ${vision}</p>
-                                    <p class="mt-2"><strong>Misi:</strong> ${mission}</p>
+                                    <p class="mt-1"><strong>Misi:</strong> ${mission}</p>
                                 </div>
 
-                                <div class="flex items-center justify-between gap-md mt-auto">
-                                    <button
-                                        type="button"
-                                        onclick="showAlert('Visi: ${vision.replace(/'/g, "\\'")} \\n\\nMisi: ${mission.replace(/'/g, "\\'")}', 'success')"
-                                        class="flex-1 border border-primary text-primary font-bold py-md rounded-xl hover:bg-surface-container-low transition-colors font-label-md"
-                                    >
-                                        Detail Visi
-                                    </button>
-
+                                <div class="flex items-center justify-between gap-md mt-auto pt-4 border-t border-outline-variant/10">
                                     <button
                                         onclick="castVote(${id})"
                                         ${isDisabled ? 'disabled' : ''}

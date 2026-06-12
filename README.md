@@ -1,59 +1,204 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🗳️ SINTING-FT (Sistem Informasi E-Voting Blockchain)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+SINTING-FT adalah sebuah Decentralized Application (DApp) yang dibangun khusus untuk memfasilitasi pemilihan ketua himpunan dan kegiatan *e-voting* di Fakultas Teknik Universitas Lambung Mangkurat.
 
-## About Laravel
+Sistem ini menjembatani keamanan portal akademik (Web2) dengan transparansi jaringan *blockchain* Ethereum (Web3), memastikan setiap suara yang masuk bersifat rahasia, aman, transparan, dan *immutable* (tidak dapat diubah/dimanipulasi).
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+# Fitur Utama
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 1. Integrasi Web2 & Web3 (Hybrid System)
 
-## Learning Laravel
+### Gerbang Web2
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+* Autentikasi mahasiswa menggunakan NIM dan Password (simulasi portal SIMARI) via sistem *session* Laravel.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Bilik Suara Web3
 
-## Laravel Sponsors
+* Validasi hak pilih dan proses *voting* murni menggunakan *Smart Contract* melalui MetaMask.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+---
 
-### Premium Partners
+## 2. Panel Admin KPU (Panitia)
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+* Mendaftarkan alamat *wallet* mahasiswa ke dalam Daftar Pemilih Tetap (DPT) ke *blockchain*.
+* Menambahkan kandidat baru beserta rincian **Visi dan Misi**.
+* Melihat status dompet pemilih (Sudah/Belum terdaftar & Sudah/Belum memilih).
+* Melihat hasil perolehan suara secara *real-time* langsung dari jaringan Sepolia.
 
-## Contributing
+---
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## 3. Panel Pemilih (Mahasiswa)
 
-## Code of Conduct
+* *Login* menggunakan data mahasiswa.
+* *Connect Wallet* menggunakan ekstensi MetaMask.
+* Melihat daftar kandidat beserta pop-up detail visi dan misinya.
+* Mencoblos kandidat pilihan (1 Wallet = 1 Suara).
+* **Session Log:** Perekaman jejak aktivitas *on-chain* secara *real-time* di UI.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+---
 
-## Security Vulnerabilities
+# Teknologi yang Digunakan
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Frontend & Backend (Web2)
 
-## License
+* Laravel (PHP Framework)
+* Tailwind CSS (UI/UX Styling)
+* MySQL (Database Akun Mahasiswa)
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Blockchain (Web3)
+
+* Solidity (Smart Contract)
+* Ethers.js v6 (Web3 Provider Interactor)
+* Jaringan **Sepolia Testnet**
+
+---
+
+# Prasyarat Instalasi
+
+Sebelum menjalankan proyek ini di mesin lokal, pastikan kamu sudah menginstal:
+
+1. **PHP** (Minimal versi 8.1) & **Composer**
+2. **Node.js** & **NPM**
+3. **MySQL** (XAMPP / Laragon)
+4. Ekstensi *browser* **MetaMask** (Sudah diset ke jaringan Sepolia Testnet dan memiliki saldo *Sepolia ETH*)
+
+---
+
+# Cara Menjalankan Proyek (Setup Lokal)
+
+## 1. Clone Repositori
+
+```bash
+git clone https://github.com/KunyitAlami/SINTING-FT
+cd SINTING-FT
+```
+
+---
+
+## 2. Install Dependensi PHP & JavaScript
+
+```bash
+composer install
+npm install
+```
+
+---
+
+## 3. Konfigurasi Environment (.env)
+
+Salin file konfigurasi contoh dan buat file `.env` baru:
+
+```bash
+cp .env.example .env
+```
+
+Buka file `.env` menggunakan teks editor, kemudian sesuaikan baris Database MySQL lokal:
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=sinting_ft
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+---
+
+## 4. Generate Application Key & Migrasi Tabel
+
+```bash
+php artisan key:generate
+php artisan migrate
+```
+
+---
+
+## 5. Eksekusi Database Seeder
+
+Langkah ini untuk memasukkan data mahasiswa simulasi (NIM 2310817120005 dst.) beserta akun Admin KPU ke dalam database MySQL.
+
+```bash
+php artisan db:seed --class=UserSeeder
+```
+
+---
+
+## 6. Jalankan Server Lokal Laravel
+
+```bash
+php artisan serve
+```
+
+Buka peramban browser Anda lalu akses rute utama:
+
+```text
+http://127.0.0.1:8000
+```
+
+---
+
+# ⛓️ Informasi Deployment Smart Contract
+
+Smart Contract proyek SINTING-FT telah diverifikasi dan berjalan aktif pada testnet global:
+
+### Contract Address
+
+```text
+0x427dC08BA46192024ceAdeD224f3251bFB8c3fBB
+```
+
+### Network Explorer
+
+Sepolia Etherscan
+
+---
+
+# ⚠️ Catatan Penting Panitia (KPU)
+
+Untuk mengoperasikan fitur **"Tambah Kandidat"** dan **"Daftarkan DPT"**, akun MetaMask yang Anda hubungkan ke dashboard admin haruslah alamat wallet pengunggah (Deployer/Committee) dari contract tersebut.
+
+Jika tidak, transaksi tulis (*write method*) otomatis akan di-*revert* oleh mesin EVM.
+
+---
+
+# 🧑‍💻 Tim Pengembang
+
+## Randy Febrian
+
+**Smart Contract & Sepolia**
+
+* Solidity
+* Deploy Contract
+* Aturan 1 Wallet 1 Vote
+* Hitung Hasil Voting
+
+## Ghani Mudzakir
+
+**Backend Laravel 11**
+
+* Database
+* Autentikasi
+* CRUD Kandidat dan Pemilih
+* API
+* Dashboard Admin
+
+## Noviana Nur Aisyah
+
+**Web3 Integration**
+
+* Ethers.js
+* Connect Wallet
+* Kirim Transaksi Voting
+* Baca Data Contract
+
+## Siti Ratna Dwinta Sari
+
+**Frontend & QA**
+
+* UI Halaman Voting
+* Hasil & Verifikasi
+* Pengujian Sistem
+* Dokumentasi
