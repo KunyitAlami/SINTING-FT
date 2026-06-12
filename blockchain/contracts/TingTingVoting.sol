@@ -4,7 +4,6 @@ pragma solidity ^0.8.24;
 contract TingTingVoting {
     event VoteIn(address dompetPemilih, uint256 idKandidat);
     event VoterRegistered(address dompetPemilih);
-    // 👈 Event diperbarui untuk membawa data visi & misi
     event CandidateAdded(uint256 id, string name, string vision, string mission);
 
     mapping(address => bool) public alreadyVote;
