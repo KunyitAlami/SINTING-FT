@@ -1,10 +1,65 @@
 # 🗳️ SINTING-FT (Sistem Informasi E-Voting Blockchain)
 
-SINTING-FT adalah sebuah Decentralized Application (DApp) yang dibangun khusus untuk memfasilitasi pemilihan ketua himpunan dan kegiatan *e-voting* di Fakultas Teknik Universitas Lambung Mangkurat.
-
-Sistem ini menjembatani keamanan portal akademik (Web2) dengan transparansi jaringan *blockchain* Ethereum (Web3), memastikan setiap suara yang masuk bersifat rahasia, aman, transparan, dan *immutable* (tidak dapat diubah/dimanipulasi).
+# Deskripsi Umum
+SINTING-FT adalah sebuah Decentralized Application (DApp) berbasis Web3 yang dibangun khusus untuk memfasilitasi proses pemilihan ketua himpunan dan kegiatan e-voting di Fakultas Teknik Universitas Lambung Mangkurat. Sistem ini dirancang untuk mempermudah proses pemilihan organisasi mahasiswa dengan memanfaatkan blockchain Testnet Sepolia, MetaMask sebagai identitas pemilih, serta smart contract Solidity yang menerapkan aturan 1 Wallet = 1 Vote. Dengan konsep tersebut, SINTING-FT mampu mencegah pemilihan ganda, meningkatkan transparansi, serta menghasilkan perhitungan suara yang aman, real-time, dan tidak dapat dimanipulasi.
 
 ---
+
+# Arsitektur Sistem
+```text
+                         +----------------------+
+                         |     Admin/Panitia    |
+                         |  (committee wallet)  |
+                         +----------+-----------+
+                                    |
+                                    | addCandidate()
+                                    | registerVoter()
+                                    v
++------------------+      +--------------------------+      +----------------------+
+|      Pemilih     |----->|     Frontend DApp        |----->| MetaMask + ethers.js |
+| (wallet voter)   |      |   (Web SINTING-FT)       |      |  koneksi ke blockchain|
++---------+--------+      +------------+-------------+      +----------+-----------+
+          |                              |                               |
+          | vote()                       | baca data kandidat            |
+          |                              | kirim transaksi               |
+          v                              v                               v
+            +---------------------------------------------------------+
+            |          Smart Contract SINTING-FT                      |
+            |---------------------------------------------------------|
+            | State / Data:                                           |
+            | - committee : address                                   |
+            | - candidateList : Candidate[]                           |
+            | - isEligible : mapping(address => bool)                 |
+            | - alreadyVote : mapping(address => bool)                |
+            |                                                         |
+            | Struct:                                                 |
+            | - Candidate { id, name, vision, mission, totalVote }    |
+            |                                                         |
+            | Modifier:                                               |
+            | - onlyCommittee                                         |
+            | - noVoteYet                                             |
+            |                                                         |
+            | Functions:                                              |
+            | - addCandidate()                                        |
+            | - registerVoter()                                       |
+            | - vote()                                                |
+            | - getAllCandidates()                                    |
+            | - getTotalCandidates()                                  |
+            |                                                         |
+            | Events:                                                 |
+            | - CandidateAdded                                        |
+            | - VoterRegistered                                       |
+            | - VoteIn                                                |
+            +---------------------------+-----------------------------+
+                                        |
+                                        v
+                            +----------------------+
+                            | Sepolia Testnet      |
+                            | Blockchain Storage   |
+                            | & Transaction Record |
+                            +----------------------+
+
+```
 
 # Fitur Utama
 
